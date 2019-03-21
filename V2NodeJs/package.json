@@ -1,0 +1,17 @@
+{
+  "name": "salary-assignment",
+  "version": "1.0.0",
+  "description": "Salary Date Assignment",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest"
+  },
+  "author": "Peter Knobloch",
+  "license": "ISC",
+  "dependencies": {
+    "commander": "^2.19.0"
+  },
+  "devDependencies": {
+    "jest": "^24.5.0"
+  }
+}
