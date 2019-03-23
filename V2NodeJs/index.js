@@ -1,72 +1,40 @@
 'use strict';
 const program = require('commander'),
-  pkg = require('./package.json'),
   fileSystem = require('fs'),
+  pkg = require('./package.json'),
+  config = require('./config'),
   salaryGenerator = require('./salaryGenerator');
 
-function endOfYear(year) {
-  return new Date(year, 11, 31);
-}
-
-function testDateFormat(date) {
-  return /^\d{4}-\d{2}$/.test(date);
-}
-
-function buildDate(date) {
-  return new Date(date + '-01');
-}
-
-const setDefaultOptions = (options) => {
-  options.paydayOffset = options.paydayOffset || -1;
-  options.bonusOffset = options.bonusOffset || 3;
-  options.bonus = options.bonus || 15;
-  return options;
-};
-
-function checkDate(options, dateKey) {
-  let result = null, hasDateError = false;
-  if (options[dateKey]) {
-    if (!testDateFormat(options[dateKey])) {
-      hasDateError = true;
-    } else {
-      result = buildDate(options[dateKey]);
-    }
-  }
-  return {result, hasDateError};
-}
-
-function getDates(options) {
-  let {startDate, hasStartDateError} = checkDate(options, 'startDate');
-  let {endDate, hasEndDateError} = checkDate(options, 'endDate');
-  if (hasStartDateError || hasEndDateError) {
-    console.error('Dates should be in the format YYYY-MM.');
-    process.exit(1);
-  }
-  startDate = startDate || new Date();
-  endDate = endDate || endOfYear(startDate.getFullYear());
-  if (startDate.getFullYear() > endDate.getFullYear()){
-    console.error('Start date should be before the end date..');
-    process.exit(1);
-  }
-  return {startDate, endDate};
-}
-
 const output = (filename, options) => {
-
-  setDefaultOptions(options);
-  const {startDate, endDate} = getDates(options);
-  if (!options.overwrite && fileSystem.existsSync(filename)) {
-    console.error('File already exists and -w or --overwrite flag is not enabled.');
-    process.exit(1);
+  if (options.debug && options.overwrite) {
+    console.error('Checking for existing file.');
+  }
+  config.abortIfCantWriteToFile(options);
+  if (options.debug) {
+    console.error('Setting defaults.');
+  }
+  config.setDefaultOptions(options);
+  if (options.debug) {
+    console.error('Checking dates.');
+  }
+  const {startDate, endDate} = config.getDates(options);
+  config.abortIfDatesAreWrong(startDate, endDate);
+  if (options.debug) {
+    console.error('Generating CSV.');
   }
   const csv = salaryGenerator.generateCSV(startDate, endDate, options);
-  if (options.debug){
-    console.log('Final output');
-    console.log('------------');
-    console.log(csv);
+  if (options.debug) {
+    console.error('Final output');
+    console.error('------------');
+    console.error(csv);
   }
-  fileSystem.writeFile(filename, csv, function (err) {
-    if (err) throw err;
+  if (options.debug) {
+    console.error('Write to file.');
+  }
+  fileSystem.writeFile(filename, csv, function (error) {
+    if (error) {
+      throw error;
+    }
     console.log('Saved!');
   });
 };
@@ -76,6 +44,7 @@ program
 .command('output [filename]')
 .option('-s, --startDate [value]', 'Set calculation start date. Expected format: YYYY-MM. (Default: Today)')
 .option('-e, --endDate [value]', 'Set calculation end date. Expected format: YYYY-MM. (Default: End of year)')
+.option('-l, --locale [value]', 'Set locale for date output (Default: en-US)')
 .option('-w, --overwrite', 'Overwrite the file if it exists.')
 .option('-h, --headers', 'Include headers.')
 .option('--paydayOffset <n>', 'Number of days before or after the weekend that salaries should be paid. (Default: -1. Off: 0)')
@@ -87,6 +56,6 @@ program
 program.parse(process.argv);
 
 // if program was called with no arguments, show help.
-if (program.args.length === 0) program.help();
-
-module.exports = {setDefaultOptions};
+if (program.args.length === 0) {
+  program.help();
+}

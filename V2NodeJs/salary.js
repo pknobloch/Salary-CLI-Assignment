@@ -9,9 +9,9 @@ function adjustBeforeWeekend(days, date) {
     return date;
   }
   // Because Sunday is 0 and Saturday is 6, change Saturday = 0 and Sunday = 1
-  let dayOfWeek = (date.getDay() + 1) % 7;
-  let direction = (days > 0) ? 1 : 0;
-  let result = new Date(date);
+  const dayOfWeek = (date.getDay() + 1) % 7;
+  const direction = (days > 0) ? 1 : 0;
+  const result = new Date(date);
   result.setDate(date.getDate() + (direction - dayOfWeek + days));
   return result;
 }
@@ -27,8 +27,8 @@ function nextMonth(date) {
 }
 
 function endOfMonth(date) {
-  let {year, month} = nextMonth(date);
-  let result = new Date(year, month, 1);
+  const {year, month} = nextMonth(date);
+  const result = new Date(year, month, 1);
   result.setDate(result.getDate() - 1);
   return result;
 }
@@ -38,14 +38,11 @@ function getPayDay(date) {
 }
 
 function getBonusDay(date) {
-  let {year, month} = nextMonth(date);
+  const {year, month} = nextMonth(date);
   return adjustBeforeWeekend(currentOptions.bonusOffset, new Date(year, month, currentOptions.bonus));
 }
 
 function getSalaryDates(date, options) {
-  if (options.debug && date) {
-    console.log(`Debug: salary.getSalaryDates(${date.toDateString()}, options)`);
-  }
   currentOptions = options;
   const payDay = getPayDay(date);
   const bonusDay = getBonusDay(date);
