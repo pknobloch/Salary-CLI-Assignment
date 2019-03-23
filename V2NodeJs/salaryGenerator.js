@@ -1,12 +1,13 @@
-const salary = require('./salary');
+const salary = require('./salary'),
+  moment = require('moment');
 
 function range(size, startAt = 0) {
   return [...Array(size).keys()].map(i => i + startAt);
 }
 
 function generate(startDate, endDate, options) {
-  return range(endDate.getMonth() - startDate.getMonth() + 1, startDate.getMonth())
-  .map(month => salary.getSalaryDates(new Date(startDate.getFullYear(), month, 1), options));
+  return range(endDate.month() - startDate.month() + 1, startDate.month())
+  .map(month => salary.getSalaryDates(moment({year:startDate.year(), month: month, day: 1}), options));
 }
 
 /**
@@ -23,12 +24,11 @@ function generateCSV(startDate, endDate, options) {
   if (options.header) {
     lines.push('Month,Salary Payment Date,Bonus Payment Date');
   }
-  const monthFormat = { month: 'long' };
-  const dateFormat = { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric'};
+  const dateFormat = 'ddd, MMM DD, YYYY';
   salaries.forEach(salary => {
-    const month = salary.payDay.toLocaleDateString(options.locale, monthFormat);
-    const payday = cleanForCSV(salary.payDay.toLocaleDateString(options.locale, dateFormat));
-    const bonusDay = cleanForCSV(salary.bonusDay.toLocaleDateString(options.locale, dateFormat));
+    const month = salary.payDay.format('MMMM');
+    const payday = cleanForCSV(salary.payDay.format(dateFormat));
+    const bonusDay = cleanForCSV(salary.bonusDay.format(dateFormat));
     lines.push(`${month},${payday},${bonusDay}`);
   });
   return lines.join('\n');

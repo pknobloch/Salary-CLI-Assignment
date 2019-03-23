@@ -1,45 +1,37 @@
+const moment = require('moment');
+
 let currentOptions = {};
 
 function isWeekend(date) {
-  return date.getDay() === 0 || date.getDay() === 6;
+  return date.isoWeekday() >= 6;
 }
 
-function adjustBeforeWeekend(days, date) {
+function adjustForWeekend(days, date) {
   if (days === 0 || !isWeekend(date)) {
     return date;
   }
-  // Because Sunday is 0 and Saturday is 6, change Saturday = 0 and Sunday = 1
-  const dayOfWeek = (date.getDay() + 1) % 7;
-  const direction = (days > 0) ? 1 : 0;
-  const result = new Date(date);
-  result.setDate(date.getDate() + (direction - dayOfWeek + days));
-  return result;
-}
-
-function nextMonth(date) {
-  let year = date.getFullYear();
-  let month = date.getMonth() + 1;
-  if (month === 12) {
-    year++;
-    month = 0;
+  let result = moment(date);
+  const direction = (days > 0) ? 1 : -1;
+  while(isWeekend(result)) {
+    result.add({days: direction});
   }
-  return {year, month};
+  //Result is now on the first day after the weekend, so remove one day
+  return result.add({days: (Math.abs(days) - 1) * direction});
 }
 
 function endOfMonth(date) {
-  const {year, month} = nextMonth(date);
-  const result = new Date(year, month, 1);
-  result.setDate(result.getDate() - 1);
-  return result;
+  return moment({year: date.year(), month: date.month(), day: 1})
+  .add({month: 1})
+  .subtract({day: 1});
 }
 
 function getPayDay(date) {
-  return adjustBeforeWeekend(currentOptions.paydayOffset, endOfMonth(date));
+  return adjustForWeekend(currentOptions.paydayOffset, endOfMonth(date));
 }
 
 function getBonusDay(date) {
-  const {year, month} = nextMonth(date);
-  return adjustBeforeWeekend(currentOptions.bonusOffset, new Date(year, month, currentOptions.bonus));
+  const bonusDay = moment({year: date.year(), month: date.month(), day: currentOptions.bonus}).add({month: 1});
+  return adjustForWeekend(currentOptions.bonusOffset, bonusDay);
 }
 
 function getSalaryDates(date, options) {

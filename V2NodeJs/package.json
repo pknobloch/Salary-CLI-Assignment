@@ -10,6 +10,7 @@
   "license": "ISC",
   "dependencies": {
     "commander": "^2.19.0",
+    "moment": "^2.24.0",
     "tmp": "0.0.33"
   },
   "devDependencies": {

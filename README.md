@@ -2,6 +2,27 @@
 
 Calculate employee payment and bonus dates using a command-line utility.
 
+To run, use node and call index.js with the output command.
+
+```
+node.exe V2NodeJs\index.js output output.csv
+```
+
+## Usage
+
+Usage: output [options] [filename]
+
+Options:
+  -s, --startDate [value]  Set calculation start date. Expected format: YYYY-MM. (Default: Today)
+  -e, --endDate [value]    Set calculation end date. Expected format: YYYY-MM. (Default: End of year)
+  -w, --overwrite          Overwrite the file if it exists.
+  -h, --headers            Include headers.
+  --paydayOffset <n>       Number of days before or after the weekend that salaries should be paid. (Default: -1. Off: 0)
+  --bonusOffset <n>        Number of days before or after the weekend that bonus should be paid. (Default: 3. Off: 0)
+  b, --bonus <n>           Day of the month that bonuses should be paid. (Default 15)
+  -D, --debug              Outputs debug code for troubleshooting problems.
+  -h, --help               output usage information
+
 ## Introduction
 
 Version 1 was written in C# with DotNet Core. after getting through 90% of the code (I am missing a CSV output), I was required to switch to NodeJS. I decided to leave the original code since I put in all the effort. 
@@ -27,8 +48,10 @@ month, and a column that contains the bonus payment date.
 
 Name | URL
 ---- | ---
-Jest testing framework | https://jestjs.io
 Commander Command Line Parser | https://www.npmjs.com/package/commander
+Moment.js | http://momentjs.com
+Jest testing framework | https://jestjs.io
+Tmp temporary file framework (for testing) | https://www.npmjs.com/package/tmp
 
 ## Version 1 External Libraries (DotNet Core)
 
