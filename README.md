@@ -10,11 +10,13 @@ node.exe V2NodeJs\index.js output output.csv
 
 ## Usage
 
+```
 Usage: output [options] [filename]
 
 Options:
   -s, --startDate [value]  Set calculation start date. Expected format: YYYY-MM. (Default: Today)
   -e, --endDate [value]    Set calculation end date. Expected format: YYYY-MM. (Default: End of year)
+  -l, --locale [value]     Set locale for date output (Default: en-US)
   -w, --overwrite          Overwrite the file if it exists.
   -h, --headers            Include headers.
   --paydayOffset <n>       Number of days before or after the weekend that salaries should be paid. (Default: -1. Off: 0)
@@ -22,6 +24,7 @@ Options:
   b, --bonus <n>           Day of the month that bonuses should be paid. (Default 15)
   -D, --debug              Outputs debug code for troubleshooting problems.
   -h, --help               output usage information
+```
 
 ## Introduction
 
